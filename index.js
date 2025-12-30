@@ -167,7 +167,7 @@ client.on('interactionCreate', async interaction => {
                         new ButtonBuilder()
                             .setCustomId('create_ticket')
                             .setLabel('Create Ticket')
-                            .setEmoji('1382653888162824242')
+                            .setEmoji('📩')
                             .setStyle(ButtonStyle.Secondary)
                     );
 
@@ -291,7 +291,7 @@ client.on('interactionCreate', async interaction => {
             if (interaction.customId === 'faq_rules') {
                 await interaction.deferReply({ ephemeral: true });
                 await interaction.editReply({
-                    content: "**Server Rules:**\n1. Be respectful.\n2. No spamming.\n3. Follow Discord TOS."
+                    content: "**Server Rules:**\n:one~1: Be respectful.\n2. No spamming.\n3. Follow Discord TOS."
                 });
             }
 
