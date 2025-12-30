@@ -9,7 +9,8 @@ const {
     PermissionsBitField,
     ChannelType,
     REST,
-    Routes
+    Routes,
+    bold
 } = require('discord.js');
 require('dotenv').config();
 const cron = require('node-cron');
@@ -157,15 +158,16 @@ client.on('interactionCreate', async interaction => {
                 await interaction.deferReply({ ephemeral: true });
 
                 const embed = new EmbedBuilder()
-                    .setTitle('Support Tickets')
-                    .setDescription('Click the button below to open a support ticket.')
-                    .setColor('Blue');
+                    .setTitle('Tickets For Tryout')
+                    .setDescription('Click the button below to create a ticket.')
+                    .setColor('Blue')
+                    .setImage('attachment://Rules_1.png');
 
                 const row = new ActionRowBuilder()
                     .addComponents(
                         new ButtonBuilder()
                             .setCustomId('create_ticket')
-                            .setLabel('Open Ticket')
+                            .setLabel('create ticket')
                             .setStyle(ButtonStyle.Primary)
                     );
 
@@ -250,9 +252,9 @@ client.on('interactionCreate', async interaction => {
                     // Row 1: Information (Rules & Loadouts & Recruitment)
                     const faqRow = new ActionRowBuilder()
                         .addComponents(
-                            new ButtonBuilder().setCustomId('faq_rules').setLabel('Server Rules').setEmoji('📜').setStyle(ButtonStyle.Secondary),
-                            new ButtonBuilder().setCustomId('faq_loadout').setLabel('Best Loadout?').setEmoji('🔫').setStyle(ButtonStyle.Secondary),
-                            new ButtonBuilder().setCustomId('faq_recruit').setLabel('How to Join?').setEmoji('🤝').setStyle(ButtonStyle.Secondary)
+                            new ButtonBuilder().setCustomId('faq_rules').setLabel('Instruction').setStyle(ButtonStyle.Secondary),
+                            new ButtonBuilder().setCustomId('faq_requirment').setLabel('Requirement').setStyle(ButtonStyle.Secondary),
+                            new ButtonBuilder().setCustomId('faq_loadout').setLabel('Loadout').setStyle(ButtonStyle.Secondary).setStyle(bold)
                         );
 
                     await channel.send({
