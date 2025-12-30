@@ -104,6 +104,13 @@ async function deployCommands() {
 // --- Event: Ready ---
 client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
+
+    // Set bot activity/status (appears below bot name)
+    client.user.setActivity('Use /setup-ticket to get started', { type: 'PLAYING' });
+    // Other options:
+    // client.user.setActivity('tickets', { type: 'WATCHING' });
+    // client.user.setActivity('your server', { type: 'LISTENING' });
+
     await deployCommands();
 
     // Auto-Close Inactive Tickets Check (Every Hour)
@@ -350,4 +357,3 @@ client.on('messageCreate', async message => {
 });
 
 client.login(TOKEN);
-
