@@ -167,7 +167,7 @@ client.on('interactionCreate', async interaction => {
                         new ButtonBuilder()
                             .setCustomId('create_ticket')
                             .setLabel('Create Ticket')
-                            .setEmoji('📩')
+                            .setEmoji('1382653888162824242')
                             .setStyle(ButtonStyle.Secondary)
                     );
 
