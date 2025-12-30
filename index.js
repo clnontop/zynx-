@@ -157,7 +157,7 @@ client.on('interactionCreate', async interaction => {
                 await interaction.deferReply({ ephemeral: true });
 
                 const embed = new EmbedBuilder()
-                    .setTitle('Tryout Ticket')
+                    .setTitle('tryout ticket')
                     .setDescription('Click the button below to create a ticket.')
                     .setColor('Blue')
                     .setImage('attachment://Rules_1.png');
@@ -167,7 +167,8 @@ client.on('interactionCreate', async interaction => {
                         new ButtonBuilder()
                             .setCustomId('create_ticket')
                             .setLabel('Create Ticket')
-                            .setStyle(ButtonStyle.Primary)
+                            .setStyle(ButtonStyle.Secondary)
+                            .setImage('attachment://Rules_1.png')
                     );
 
                 await interaction.channel.send({ embeds: [embed], components: [row] });
