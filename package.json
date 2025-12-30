@@ -9,7 +9,7 @@
   "keywords": [],
   "author": "cln.a1",
   "license": "ISC",
-  "description": "",
+  "description": "Admin bot for Zynx",
   "dependencies": {
     "discord.js": "^14.25.1",
     "dotenv": "^17.2.3",
