@@ -291,7 +291,10 @@ client.on('interactionCreate', async interaction => {
             if (interaction.customId === 'faq_rules') {
                 await interaction.deferReply({ ephemeral: true });
                 await interaction.editReply({
-                    content: "**Server Rules:**\n:one~1: Be respectful.\n2. No spamming.\n3. Follow Discord TOS."
+                    content: "## INSTRUCTIONS\n\n" +
+                        "✅ **Make sure to wait for the tryout team to @ you and be patient.**\n\n" +
+                        "🔗 **Please join through the link given or add the player for your tryouts.**\n\n" +
+                        "🏆 **If you win against the tryout manager you're in the clan.**"
                 });
             }
 
@@ -347,3 +350,4 @@ client.on('messageCreate', async message => {
 });
 
 client.login(TOKEN);
+
