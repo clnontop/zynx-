@@ -168,10 +168,16 @@ client.on('interactionCreate', async interaction => {
                             .setCustomId('create_ticket')
                             .setLabel('Create Ticket')
                             .setStyle(ButtonStyle.Secondary)
-                            .setImage('attachment://Rules_1.png')
                     );
 
-                await interaction.channel.send({ embeds: [embed], components: [row] });
+                await interaction.channel.send({
+                    embeds: [embed],
+                    components: [row],
+                    files: [{
+                        attachment: path.join(__dirname, 'Rules_1.png'),
+                        name: 'Rules_1.png'
+                    }]
+                });
                 return interaction.editReply({ content: 'Ticket panel created!' });
             }
 
@@ -317,3 +323,4 @@ client.on('messageCreate', async message => {
 });
 
 client.login(TOKEN);
+
