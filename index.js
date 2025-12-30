@@ -9,7 +9,8 @@ const {
     PermissionsBitField,
     ChannelType,
     REST,
-    Routes
+    Routes,
+    ActivityType
 } = require('discord.js');
 require('dotenv').config();
 const cron = require('node-cron');
@@ -106,10 +107,11 @@ client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
 
     // Set bot activity/status (appears below bot name)
-    client.user.setActivity('Use /setup-ticket to get started', { type: 'PLAYING' });
+    client.user.setActivity('Use /setup-ticket to get started', { type: ActivityType.Playing });
     // Other options:
-    // client.user.setActivity('tickets', { type: 'WATCHING' });
-    // client.user.setActivity('your server', { type: 'LISTENING' });
+    // client.user.setActivity('tickets', { type: ActivityType.Watching });
+    // client.user.setActivity('your server', { type: ActivityType.Listening });
+    // client.user.setActivity('in tournaments', { type: ActivityType.Competing });
 
     await deployCommands();
 
