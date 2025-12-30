@@ -318,7 +318,17 @@ client.on('interactionCreate', async interaction => {
             if (interaction.customId === 'faq_requirment') {
                 await interaction.deferReply({ ephemeral: true });
                 await interaction.editReply({
-                    content: "**Requirements:**\n1. Must be level 50+\n2. K/D ratio above 1.5\n3. Active player (10+ hours/week)"
+                    content: "## REQUIREMENTS\n\n" +
+                        "**MUST BE 150+ LV ACCOUNT**\n\n" +
+                        "**Rank:**\n" +
+                        "• PLAT 1 OR HIGHER FOR PC\n" +
+                        "• GOLD 2 FOR PHONE PLAYERS\n\n" +
+                        "📸 **PLEASE MAKE SURE TO TAKE A PICTURE OF THE ACCOUNT YOU'RE GOING TO PLAY TRYOUTS.**\n" +
+                        "Managers will ask you for your profile stats so make sure to keep it ready.",
+                    files: [{
+                        attachment: path.join(__dirname, 'requiremenets.png'),
+                        name: 'requiremenets.png'
+                    }]
                 });
             }
         }
