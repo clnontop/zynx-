@@ -154,6 +154,8 @@ client.on('interactionCreate', async interaction => {
             }
 
             if (commandName === 'setup-ticket') {
+                await interaction.deferReply({ ephemeral: true });
+
                 const embed = new EmbedBuilder()
                     .setTitle('Support Tickets')
                     .setDescription('Click the button below to open a support ticket.')
@@ -164,22 +166,24 @@ client.on('interactionCreate', async interaction => {
                         new ButtonBuilder()
                             .setCustomId('create_ticket')
                             .setLabel('Open Ticket')
-                            .setStyle(ButtonStyle.Secondary)
+                            .setStyle(ButtonStyle.Primary)
                     );
 
                 await interaction.channel.send({ embeds: [embed], components: [row] });
-                return interaction.reply({ content: 'Ticket panel created!', ephemeral: true });
+                return interaction.editReply({ content: 'Ticket panel created!' });
             }
 
             if (commandName === 'announce') {
+                await interaction.deferReply({ ephemeral: true });
+
                 const message = interaction.options.getString('message');
                 const channel = interaction.options.getChannel('channel') || interaction.channel;
 
                 try {
                     await channel.send({ content: `**Announcement**\n\n${message}` });
-                    return interaction.reply({ content: 'Announcement sent!', ephemeral: true });
+                    return interaction.editReply({ content: 'Announcement sent!' });
                 } catch (err) {
-                    return interaction.reply({ content: `Failed to send announcement: ${err.message}`, ephemeral: true });
+                    return interaction.editReply({ content: `Failed to send announcement: ${err.message}` });
                 }
             }
 
