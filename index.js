@@ -106,12 +106,20 @@ async function deployCommands() {
 client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
 
-    // Set bot activity/status (appears below bot name)
-    client.user.setActivity('Use /setup-ticket to get started', { type: ActivityType.Playing });
-    // Other options:
-    // client.user.setActivity('tickets', { type: ActivityType.Watching });
-    // client.user.setActivity('your server', { type: ActivityType.Listening });
-    // client.user.setActivity('in tournaments', { type: ActivityType.Competing });
+    // Set bot presence (status + activity)
+    client.user.setPresence({
+        status: 'idle', // Options: 'online', 'idle', 'dnd', 'invisible'
+        activities: [{
+            name: 'Use /setup-ticket to get started',
+            type: ActivityType.Playing
+        }]
+    });
+
+    // Other status examples:
+    // status: 'online'    → Green circle (default)
+    // status: 'idle'      → Yellow/orange crescent moon
+    // status: 'dnd'       → Red circle with line (Do Not Disturb)
+    // status: 'invisible' → Appears offline (gray)
 
     await deployCommands();
 
