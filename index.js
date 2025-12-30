@@ -268,7 +268,8 @@ client.on('interactionCreate', async interaction => {
 
                 } catch (err) {
                     console.error("Error creating ticket:", err);
-                    await interaction.editReply({ content: 'Failed to create ticket. Check bot permissions.' });
+                    // Show the specific error to help debug
+                    await interaction.editReply({ content: `Failed to create ticket.\n**Reason:** ${err.message}` });
                 }
                 return;
             }
