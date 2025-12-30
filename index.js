@@ -9,8 +9,7 @@ const {
     PermissionsBitField,
     ChannelType,
     REST,
-    Routes,
-    bold
+    Routes
 } = require('discord.js');
 require('dotenv').config();
 const cron = require('node-cron');
@@ -158,7 +157,7 @@ client.on('interactionCreate', async interaction => {
                 await interaction.deferReply({ ephemeral: true });
 
                 const embed = new EmbedBuilder()
-                    .setTitle('Tickets For Tryout')
+                    .setTitle('Tryout Ticket')
                     .setDescription('Click the button below to create a ticket.')
                     .setColor('Blue')
                     .setImage('attachment://Rules_1.png');
@@ -167,7 +166,7 @@ client.on('interactionCreate', async interaction => {
                     .addComponents(
                         new ButtonBuilder()
                             .setCustomId('create_ticket')
-                            .setLabel('create ticket')
+                            .setLabel('Create Ticket')
                             .setStyle(ButtonStyle.Primary)
                     );
 
@@ -254,7 +253,7 @@ client.on('interactionCreate', async interaction => {
                         .addComponents(
                             new ButtonBuilder().setCustomId('faq_rules').setLabel('Instruction').setStyle(ButtonStyle.Secondary),
                             new ButtonBuilder().setCustomId('faq_requirment').setLabel('Requirement').setStyle(ButtonStyle.Secondary),
-                            new ButtonBuilder().setCustomId('faq_loadout').setLabel('Loadout').setStyle(ButtonStyle.Secondary).setStyle(bold)
+                            new ButtonBuilder().setCustomId('faq_loadout').setLabel('Loadout').setStyle(ButtonStyle.Secondary)
                         );
 
                     await channel.send({
@@ -295,10 +294,10 @@ client.on('interactionCreate', async interaction => {
                 });
             }
 
-            if (interaction.customId === 'faq_recruit') {
+            if (interaction.customId === 'faq_requirment') {
                 await interaction.deferReply({ ephemeral: true });
                 await interaction.editReply({
-                    content: "**How to Join:**\nFill out the application form in #apply channel and wait for an officer to review it."
+                    content: "**Requirements:**\n1. Must be level 50+\n2. K/D ratio above 1.5\n3. Active player (10+ hours/week)"
                 });
             }
         }
