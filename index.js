@@ -167,6 +167,7 @@ client.on('interactionCreate', async interaction => {
                         new ButtonBuilder()
                             .setCustomId('create_ticket')
                             .setLabel('Create Ticket')
+                            .setEmoji('📩')
                             .setStyle(ButtonStyle.Secondary)
                     );
 
@@ -323,4 +324,3 @@ client.on('messageCreate', async message => {
 });
 
 client.login(TOKEN);
-
