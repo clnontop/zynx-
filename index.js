@@ -110,7 +110,7 @@ client.once('ready', async () => {
     client.user.setPresence({
         status: 'idle', // Options: 'online', 'idle', 'dnd', 'invisible'
         activities: [{
-            name: 'Use /setup-ticket to get started',
+            name: 'Create Tickets for Any Issues',
             type: ActivityType.Playing
         }]
     });
@@ -367,3 +367,4 @@ client.on('messageCreate', async message => {
 });
 
 client.login(TOKEN);
+
