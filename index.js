@@ -298,7 +298,19 @@ client.on('interactionCreate', async interaction => {
             if (interaction.customId === 'faq_loadout') {
                 await interaction.deferReply({ ephemeral: true });
                 await interaction.editReply({
-                    content: "**Recommended Loadout:**\n- Primary: M4A1 (Meta Build)\n- Secondary: Renetti\n- Perk: Ghost"
+                    content: "<:one:1454366173092384820> **DL (Default Loadout)**\n" +
+                        "          • Primary: AR\n" +
+                        "          • Secondary: Handgun\n" +
+                        "          • Melee: Fists\n" +
+                        "          • Utility: Grenade\n\n" +
+                        "<:two:1454366179127857267> **CL (Custom Loadout)**\n" +
+                        "          • Anything is allowed\n" +
+                        "          • Pay to Win items are not allowed\n\n" +
+                        "<:three:1454366181677862963> **SRL (Sniper Restricted Loadout)**\n" +
+                        "           • Primary: Sniper\n" +
+                        "           • Secondary: Handgun / Revolver\n" +
+                        "           • Melee: Fists / Scythe\n" +
+                        "           • Utility: Grenade / Warhorn"
                 });
             }
 
@@ -324,3 +336,4 @@ client.on('messageCreate', async message => {
 });
 
 client.login(TOKEN);
+
