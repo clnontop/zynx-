@@ -275,23 +275,23 @@ client.on('interactionCreate', async interaction => {
 
             // --- FAQ Handlers ---
             if (interaction.customId === 'faq_rules') {
-                await interaction.deferReply({ ephemeral: false }); // Public reply
+                await interaction.deferReply({ ephemeral: true });
                 await interaction.editReply({
-                    content: `${interaction.user} **Server Rules:**\n1. Be respectful.\n2. No spamming.\n3. Follow Discord TOS.`
+                    content: "**Server Rules:**\n1. Be respectful.\n2. No spamming.\n3. Follow Discord TOS."
                 });
             }
 
             if (interaction.customId === 'faq_loadout') {
-                await interaction.deferReply({ ephemeral: false }); // Public reply
+                await interaction.deferReply({ ephemeral: true });
                 await interaction.editReply({
-                    content: `${interaction.user} **Recommended Loadout:**\n- Primary: M4A1 (Meta Build)\n- Secondary: Renetti\n- Perk: Ghost`
+                    content: "**Recommended Loadout:**\n- Primary: M4A1 (Meta Build)\n- Secondary: Renetti\n- Perk: Ghost"
                 });
             }
 
             if (interaction.customId === 'faq_recruit') {
-                await interaction.deferReply({ ephemeral: false }); // Public reply
+                await interaction.deferReply({ ephemeral: true });
                 await interaction.editReply({
-                    content: `${interaction.user} **How to Join:**\nFill out the application form in #apply channel and wait for an officer to review it.`
+                    content: "**How to Join:**\nFill out the application form in #apply channel and wait for an officer to review it."
                 });
             }
         }
