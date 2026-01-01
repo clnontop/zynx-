@@ -36,6 +36,7 @@ const client = new Client({
 
 // --- State Management ---
 let ticketActivity = new Map();
+let ticketProgress = new Map(); // Tracks button clicks: channelId -> Set(['rules', 'req', 'loadout'])
 const TICKETS_FILE = path.join(__dirname, 'tickets.json');
 
 // Load tickets
@@ -51,6 +52,43 @@ if (fs.existsSync(TICKETS_FILE)) {
 function saveTickets() {
     const data = Object.fromEntries(ticketActivity);
     fs.writeFileSync(TICKETS_FILE, JSON.stringify(data, null, 2));
+}
+
+// Helper: Check Progress & Unlock
+async function checkProgress(interaction, part) {
+    const channelId = interaction.channel.id;
+
+    // Initialize if empty
+    if (!ticketProgress.has(channelId)) {
+        ticketProgress.set(channelId, new Set());
+    }
+
+    // Add current part
+    const progress = ticketProgress.get(channelId);
+    progress.add(part);
+
+    // Check if complete (3 parts: rules, req, loadout)
+    if (progress.size >= 3) {
+        // Unlock Chat
+        await interaction.channel.permissionOverwrites.edit(interaction.user.id, {
+            SendMessages: true,
+            ViewChannel: true
+        });
+
+        await interaction.followUp({
+            content: '🎉 **You have read everything! Chat has been unlocked.**',
+            ephemeral: true
+        });
+
+        // Optional: clear progress to save memory
+        ticketProgress.delete(channelId);
+    } else {
+        const remaining = 3 - progress.size;
+        await interaction.followUp({
+            content: `✅ Read! (${progress.size}/3)\nPlease read ${remaining} more section(s) to unlock chat.`,
+            ephemeral: true
+        });
+    }
 }
 
 // --- Commands Definition ---
@@ -271,7 +309,8 @@ client.on('interactionCreate', async interaction => {
                         },
                         {
                             id: interaction.user.id,
-                            allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
+                            allow: [PermissionsBitField.Flags.ViewChannel],
+                            deny: [PermissionsBitField.Flags.SendMessages] // 🔒 LOCKED INITIALLY
                         },
                         {
                             id: client.user.id,
@@ -306,7 +345,7 @@ client.on('interactionCreate', async interaction => {
 
                     const embed = new EmbedBuilder()
                         .setTitle(`Hello ${interaction.user.username}`)
-                        .setDescription('Welcome to support! Choose an option below to get instant help, or wait for a staff member.')
+                        .setDescription('Welcome to support! 🔒 **Chat is locked.**\n\nPlease read **Instructions**, **Requirements**, and **Loadout** by clicking the buttons below to unlock the chat.')
                         .setColor('Blue')
                         .setImage('attachment://Rules_1.png'); // LINK TO ATTACHMENT
 
@@ -351,6 +390,7 @@ client.on('interactionCreate', async interaction => {
                         "🔗 **Please join through the link given or add the player for your tryouts.**\n\n" +
                         "🏆 **If you win against the tryout manager you're in the clan.**"
                 });
+                await checkProgress(interaction, 'rules');
             }
 
             if (interaction.customId === 'faq_loadout') {
@@ -371,6 +411,7 @@ client.on('interactionCreate', async interaction => {
                         "           • Melee: Fists / Scythe\n" +
                         "           • Utility: Grenade / Warhorn"
                 });
+                await checkProgress(interaction, 'loadout');
             }
 
             if (interaction.customId === 'faq_requirment') {
@@ -388,6 +429,7 @@ client.on('interactionCreate', async interaction => {
                         name: 'requiremenets.png'
                     }]
                 });
+                await checkProgress(interaction, 'req');
             }
         }
     } catch (error) {
