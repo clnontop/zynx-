@@ -219,6 +219,23 @@ client.on('interactionCreate', async interaction => {
                     return interaction.reply({ content: 'This command can only be used in ticket channels.', ephemeral: true });
                 }
 
+                // Permission check for close command
+                const closeRole1 = process.env.CLOSE_ROLE_ID_1;
+                const closeRole2 = process.env.CLOSE_ROLE_ID_2;
+                const closeRole3 = process.env.CLOSE_ROLE_ID_3;
+
+                const hasCloseRole1 = closeRole1 && interaction.member.roles.cache.has(closeRole1);
+                const hasCloseRole2 = closeRole2 && interaction.member.roles.cache.has(closeRole2);
+                const hasCloseRole3 = closeRole3 && interaction.member.roles.cache.has(closeRole3);
+
+                // Check if user has permission (Admin, Mod, or any of the 3 close roles)
+                if (!isAdmin && !hasModRole && !hasCloseRole1 && !hasCloseRole2 && !hasCloseRole3) {
+                    return interaction.reply({
+                        content: '⛔ You do not have permission to close tickets.',
+                        ephemeral: true
+                    });
+                }
+
                 await interaction.reply({ content: 'Closing ticket in 5 seconds...' });
                 setTimeout(async () => {
                     if (interaction.channel) {
@@ -246,24 +263,45 @@ client.on('interactionCreate', async interaction => {
                 const categoryId = process.env.TICKET_CATEGORY_ID;
 
                 try {
+                    // 1. Prepare Permissions
+                    const permissions = [
+                        {
+                            id: guild.id,
+                            deny: [PermissionsBitField.Flags.ViewChannel],
+                        },
+                        {
+                            id: interaction.user.id,
+                            allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
+                        },
+                        {
+                            id: client.user.id,
+                            allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
+                        }
+                    ];
+
+                    // 2. Add Staff Roles (Mod + Extra Close Roles)
+                    const staffRoles = [
+                        process.env.MOD_ROLE_ID,
+                        process.env.CLOSE_ROLE_ID_1,
+                        process.env.CLOSE_ROLE_ID_2,
+                        process.env.CLOSE_ROLE_ID_3
+                    ];
+
+                    for (const roleId of staffRoles) {
+                        if (roleId) {
+                            permissions.push({
+                                id: roleId,
+                                allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
+                            });
+                        }
+                    }
+
+                    // 3. Create Channel
                     const channel = await guild.channels.create({
                         name: `ticket-${interaction.user.username}`,
                         type: ChannelType.GuildText,
                         parent: categoryId,
-                        permissionOverwrites: [
-                            {
-                                id: guild.id,
-                                deny: [PermissionsBitField.Flags.ViewChannel],
-                            },
-                            {
-                                id: interaction.user.id,
-                                allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
-                            },
-                            {
-                                id: client.user.id,
-                                allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
-                            }
-                        ],
+                        permissionOverwrites: permissions,
                     });
 
                     const embed = new EmbedBuilder()
@@ -367,4 +405,3 @@ client.on('messageCreate', async message => {
 });
 
 client.login(TOKEN);
-
