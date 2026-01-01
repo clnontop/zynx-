@@ -368,6 +368,11 @@ client.on('interactionCreate', async interaction => {
                         }]
                     });
 
+                    // BIG Warning Message
+                    await channel.send({
+                        content: "# 🛑 ACTION REQUIRED\n# 🔒 YOU MUST GO THROUGH ALL 3 TOPICS (Instruction, Requirement, Loadout) TO UNLOCK THE CHAT!\n### ⚠️ You cannot speak to Tryout Managers until you read everything."
+                    });
+
                     ticketActivity.set(channel.id, Date.now());
                     saveTickets();
 
