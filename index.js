@@ -326,12 +326,18 @@ client.on('interactionCreate', async interaction => {
                         process.env.CLOSE_ROLE_ID_3
                     ];
 
-                    for (const roleId of staffRoles) {
-                        if (roleId) {
-                            permissions.push({
-                                id: roleId,
-                                allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
-                            });
+                    for (const rawRoleId of staffRoles) {
+                        if (rawRoleId) {
+                            // Clean ID: Remove comments (stuff after #) and spaces
+                            const roleId = rawRoleId.split('#')[0].trim();
+
+                            // Validate: Only add if it's a valid number ID
+                            if (/^\d{17,20}$/.test(roleId)) {
+                                permissions.push({
+                                    id: roleId,
+                                    allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages],
+                                });
+                            }
                         }
                     }
 
