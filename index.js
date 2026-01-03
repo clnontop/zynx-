@@ -493,4 +493,21 @@ client.on('messageCreate', async message => {
     }
 });
 
+// --- Event: New Member Welcome ---
+client.on('guildMemberAdd', async member => {
+    const welcomeChannelId = process.env.WELCOME_CHANNEL_ID;
+    if (!welcomeChannelId) return;
+
+    const channel = member.guild.channels.cache.get(welcomeChannelId);
+    if (channel) {
+        try {
+            await channel.send({
+                content: `Welcome ${member} to **${member.guild.name}**! This is the main chat where you can find yourself friends and have fun with them. Hope u have a great time! 🎉`
+            });
+        } catch (err) {
+            console.error("Failed to send welcome message:", err);
+        }
+    }
+});
+
 client.login(TOKEN);
