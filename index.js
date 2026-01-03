@@ -495,18 +495,40 @@ client.on('messageCreate', async message => {
 
 // --- Event: New Member Welcome ---
 client.on('guildMemberAdd', async member => {
+    // 1. Send Public Welcome Message
     const welcomeChannelId = process.env.WELCOME_CHANNEL_ID;
-    if (!welcomeChannelId) return;
-
-    const channel = member.guild.channels.cache.get(welcomeChannelId);
-    if (channel) {
-        try {
-            await channel.send({
-                content: `Welcome ${member} to **${member.guild.name}**! This is the main chat where you can find yourself friends and have fun with them. Hope u have a great time! 🎉`
-            });
-        } catch (err) {
-            console.error("Failed to send welcome message:", err);
+    if (welcomeChannelId) {
+        const channel = member.guild.channels.cache.get(welcomeChannelId);
+        if (channel) {
+            try {
+                await channel.send({
+                    content: `Welcome ${member} to **${member.guild.name}**! This is the main chat where you can find yourself friends and have fun with them. Hope u have a great time! 🎉`
+                });
+            } catch (err) {
+                console.error("Failed to send welcome message:", err);
+            }
         }
+    }
+
+    // 2. Send Private DM Guide
+    try {
+        const rulesId = process.env.RULES_CHANNEL_ID ? `<#${process.env.RULES_CHANNEL_ID}>` : "**Rules Channel**";
+        const generalId = process.env.WELCOME_CHANNEL_ID ? `<#${process.env.WELCOME_CHANNEL_ID}>` : "**General Chat**";
+        const giveawayId = process.env.GIVEAWAY_CHANNEL_ID ? `<#${process.env.GIVEAWAY_CHANNEL_ID}>` : "**Giveaways**";
+        const ticketId = process.env.TICKET_PANEL_CHANNEL_ID ? `<#${process.env.TICKET_PANEL_CHANNEL_ID}>` : "**Ticket Channel**";
+
+        const dmMessage =
+            `Welcome on **ZYNX**, ${member} ! 👋🏻\n\n` +
+            `**__Channels you should visit__**\n\n` +
+            `${rulesId} 📑・𝐬𝐞𝐫𝐯𝐞𝐫・𝐫𝐮𝐥𝐞𝐬:  Make sure to read all the server rules and guidelines and react to the text before texting in the channels.\n\n` +
+            `${generalId} ▷・𝐠𝐞𝐧𝐞𝐫𝐚𝐥:  For chatting and making new mates. Visit this particular channel.\n\n` +
+            `${giveawayId} 🎉・𝐠𝐢𝐯𝐞𝐚𝐰𝐚𝐲𝐬:  Make sure to visit the giveaway channel if there's any giveaways event going on make sure to get in to get a chance to win robux or skincases\n\n` +
+            `${ticketId} 🎟️・𝐭𝐢𝐜𝐤𝐞𝐭:  If you want to join the clan make sure to create a ticket and read the tryout rules.\n\n` +
+            `Thank you, have a good journey on **ZYNX**.`
+
+        await member.send(dmMessage);
+    } catch (err) {
+        console.log(`Could not DM new member ${member.user.tag} (DMs closed?)`);
     }
 });
 
