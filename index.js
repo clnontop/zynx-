@@ -275,16 +275,15 @@ client.on('interactionCreate', async interaction => {
                 }
 
                 await interaction.reply({ content: 'Closing ticket in 5 seconds... Generating transcript...' });
-                
+
                 // --- GENERATE TRANSCRIPT & DM USER ---
                 try {
                     // 1. Fetch Messages (Limit 100)
                     const messages = await interaction.channel.messages.fetch({ limit: 100 });
                     const transcript = messages.reverse().map(m => {
-                        const time = new Date(m.createdTimestamp).toLocaleString();
                         const content = m.content;
                         const attachments = m.attachments.size > 0 ? ` [Attachments: ${m.attachments.map(a => a.url).join(', ')}]` : '';
-                        return `[${time}] ${m.author.tag}: ${content}${attachments}`;
+                        return `${m.author.tag}: ${content}${attachments}`;
                     }).join('\n');
 
                     // 2. Create Buffer
@@ -294,7 +293,7 @@ client.on('interactionCreate', async interaction => {
                     // We look for a Member overwrite that is NOT the bot
                     const overlays = interaction.channel.permissionOverwrites.cache;
                     const creatorOverwrite = overlays.find(p => p.type === 1 && p.id !== client.user.id);
-                    
+
                     if (creatorOverwrite) {
                         const creator = await interaction.guild.members.fetch(creatorOverwrite.id);
                         if (creator) {
