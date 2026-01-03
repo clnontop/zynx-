@@ -274,7 +274,44 @@ client.on('interactionCreate', async interaction => {
                     });
                 }
 
-                await interaction.reply({ content: 'Closing ticket in 5 seconds...' });
+                await interaction.reply({ content: 'Closing ticket in 5 seconds... Generating transcript...' });
+                
+                // --- GENERATE TRANSCRIPT & DM USER ---
+                try {
+                    // 1. Fetch Messages (Limit 100)
+                    const messages = await interaction.channel.messages.fetch({ limit: 100 });
+                    const transcript = messages.reverse().map(m => {
+                        const time = new Date(m.createdTimestamp).toLocaleString();
+                        const content = m.content;
+                        const attachments = m.attachments.size > 0 ? ` [Attachments: ${m.attachments.map(a => a.url).join(', ')}]` : '';
+                        return `[${time}] ${m.author.tag}: ${content}${attachments}`;
+                    }).join('\n');
+
+                    // 2. Create Buffer
+                    const buffer = Buffer.from(`TRANSCRIPT FOR ${interaction.channel.name}\n\n${transcript}`, 'utf-8');
+
+                    // 3. Find Ticket Creator (User with specific ViewChannel permission)
+                    // We look for a Member overwrite that is NOT the bot
+                    const overlays = interaction.channel.permissionOverwrites.cache;
+                    const creatorOverwrite = overlays.find(p => p.type === 1 && p.id !== client.user.id);
+                    
+                    if (creatorOverwrite) {
+                        const creator = await interaction.guild.members.fetch(creatorOverwrite.id);
+                        if (creator) {
+                            await creator.send({
+                                content: `Here is the transcript for your ticket **${interaction.channel.name}**.`,
+                                files: [{
+                                    attachment: buffer,
+                                    name: `transcript-${interaction.channel.name}.txt`
+                                }]
+                            }).catch(err => console.log("Could not DM user transcript (blocked DMs?)"));
+                        }
+                    }
+
+                } catch (err) {
+                    console.error("Error generating transcript:", err);
+                }
+
                 setTimeout(async () => {
                     if (interaction.channel) {
                         try {
