@@ -488,7 +488,41 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-// Old messageCreate listener removed (integrated above)
+// --- Event: Message Handler (Activity & Screenshot Check) ---
+client.on('messageCreate', async message => {
+    if (message.author.bot) return;
+
+    // 1. Inactivity Tracker
+    if (ticketActivity.has(message.channel.id)) {
+        ticketActivity.set(message.channel.id, Date.now());
+        saveTickets();
+    }
+
+    // 2. Screenshot Verification Enforcer
+    if (pendingScreenshot.has(message.channel.id)) {
+        // Staff Bypass Check (Admin or Mod)
+        const member = message.member;
+        const isAdmin = member.permissions.has(PermissionsBitField.Flags.Administrator);
+        const hasModRole = process.env.MOD_ROLE_ID && member.roles.cache.has(process.env.MOD_ROLE_ID);
+
+        if (isAdmin || hasModRole) return; // Allow staff to speak
+
+        // If message has NO attachments, block it.
+        if (message.attachments.size === 0) {
+            try {
+                await message.delete();
+                const warning = await message.channel.send(`${message.author} ⚠️ **STOP!** You must send your **Rivals Level Screenshot** first before you can chat!`);
+                setTimeout(() => warning.delete().catch(() => { }), 5000);
+            } catch (e) {
+                console.error("Failed to delete screenshot-check message", e);
+            }
+        } else {
+            // Image Sent! Verification Complete.
+            pendingScreenshot.delete(message.channel.id);
+            await message.channel.send(`✅ **Screenshot Received!**\nThank you ${message.author}. You can now chat with the Tryout Managers.`);
+        }
+    }
+});
 
 // --- Event: New Member Welcome ---
 client.on('guildMemberAdd', async member => {
