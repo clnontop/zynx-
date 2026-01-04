@@ -36,7 +36,8 @@ const client = new Client({
 
 // --- State Management ---
 let ticketActivity = new Map();
-let ticketProgress = new Map(); // Tracks button clicks: channelId -> Set(['rules', 'req', 'loadout'])
+let ticketProgress = new Map(); // Tracks button clicks
+let pendingScreenshot = new Set(); // Tracks channels waiting for level screenshot
 const TICKETS_FILE = path.join(__dirname, 'tickets.json');
 
 // Load tickets
@@ -75,9 +76,12 @@ async function checkProgress(interaction, part) {
             ViewChannel: true
         });
 
+        // Add to screenshot pending list
+        pendingScreenshot.add(channelId);
+
         await interaction.followUp({
-            content: '🎉 **You have read everything! Chat has been unlocked.**',
-            ephemeral: true
+            content: '🎉 **Topics Read! Chat Unlocked.**\n\n🛑 **ONE LAST STEP:**\nBefore you can chat with managers, you **MUST** upload a screenshot of your **Rivals Level**.\n\n*Sending text is disabled until you upload the image.*',
+            ephemeral: false
         });
 
         // Optional: clear progress to save memory
@@ -484,14 +488,7 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-client.on('messageCreate', async message => {
-    if (message.author.bot) return;
-
-    if (ticketActivity.has(message.channel.id)) {
-        ticketActivity.set(message.channel.id, Date.now());
-        saveTickets();
-    }
-});
+// Old messageCreate listener removed (integrated above)
 
 // --- Event: New Member Welcome ---
 client.on('guildMemberAdd', async member => {
