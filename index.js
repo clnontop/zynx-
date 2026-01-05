@@ -500,12 +500,24 @@ client.on('messageCreate', async message => {
 
     // 2. Screenshot Verification Enforcer
     if (pendingScreenshot.has(message.channel.id)) {
-        // Staff Bypass Check (Admin or Mod)
+        // Staff Bypass Check (Admin, Mod, or Close Roles)
         const member = message.member;
         const isAdmin = member.permissions.has(PermissionsBitField.Flags.Administrator);
-        const hasModRole = process.env.MOD_ROLE_ID && member.roles.cache.has(process.env.MOD_ROLE_ID);
 
-        if (isAdmin || hasModRole) return; // Allow staff to speak
+        // Helper to check role safely (handling comments in .env)
+        const hasRole = (envVar) => {
+            if (!envVar) return false;
+            const roleId = envVar.split('#')[0].trim();
+            return member.roles.cache.has(roleId);
+        };
+
+        const isStaff = isAdmin ||
+            hasRole(process.env.MOD_ROLE_ID) ||
+            hasRole(process.env.CLOSE_ROLE_ID_1) ||
+            hasRole(process.env.CLOSE_ROLE_ID_2) ||
+            hasRole(process.env.CLOSE_ROLE_ID_3);
+
+        if (isStaff) return; // Allow staff to speak
 
         // If message has NO attachments, block it.
         if (message.attachments.size === 0) {
