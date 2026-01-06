@@ -345,12 +345,20 @@ client.on('interactionCreate', async interaction => {
                     const permissions = [
                         {
                             id: guild.id,
-                            deny: [PermissionsBitField.Flags.ViewChannel],
+                            deny: [
+                                PermissionsBitField.Flags.ViewChannel,
+                                PermissionsBitField.Flags.CreatePublicThreads,
+                                PermissionsBitField.Flags.CreatePrivateThreads
+                            ],
                         },
                         {
                             id: interaction.user.id,
                             allow: [PermissionsBitField.Flags.ViewChannel],
-                            deny: [PermissionsBitField.Flags.SendMessages] // 🔒 LOCKED INITIALLY
+                            deny: [
+                                PermissionsBitField.Flags.SendMessages, // 🔒 LOCKED INITIALLY
+                                PermissionsBitField.Flags.CreatePublicThreads,
+                                PermissionsBitField.Flags.CreatePrivateThreads
+                            ]
                         },
                         {
                             id: client.user.id,
