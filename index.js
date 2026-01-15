@@ -38,7 +38,10 @@ const client = new Client({
 let ticketActivity = new Map();
 let ticketProgress = new Map(); // Tracks button clicks
 let pendingScreenshot = new Set(); // Tracks channels waiting for level screenshot
+let ticketCooldowns = new Map(); // Tracks user cooldowns: userId -> timestamp
+
 const TICKETS_FILE = path.join(__dirname, 'tickets.json');
+const COOLDOWNS_FILE = path.join(__dirname, 'cooldowns.json');
 
 // Load tickets
 if (fs.existsSync(TICKETS_FILE)) {
@@ -50,9 +53,24 @@ if (fs.existsSync(TICKETS_FILE)) {
     }
 }
 
+// Load cooldowns
+if (fs.existsSync(COOLDOWNS_FILE)) {
+    try {
+        const data = JSON.parse(fs.readFileSync(COOLDOWNS_FILE, 'utf8'));
+        ticketCooldowns = new Map(Object.entries(data));
+    } catch (e) {
+        console.error("Error loading cooldowns:", e);
+    }
+}
+
 function saveTickets() {
     const data = Object.fromEntries(ticketActivity);
     fs.writeFileSync(TICKETS_FILE, JSON.stringify(data, null, 2));
+}
+
+function saveCooldowns() {
+    const data = Object.fromEntries(ticketCooldowns);
+    fs.writeFileSync(COOLDOWNS_FILE, JSON.stringify(data, null, 2));
 }
 
 // Helper: Check Progress & Unlock
@@ -335,6 +353,25 @@ client.on('interactionCreate', async interaction => {
 
             // --- Create Ticket ---
             if (interaction.customId === 'create_ticket') {
+                // Cooldown Check (2 Days)
+                const COOLDOWN_TIME = 2 * 24 * 60 * 60 * 1000;
+                const lastCreation = ticketCooldowns.get(interaction.user.id);
+
+                if (lastCreation) {
+                    const timeElapsed = Date.now() - lastCreation;
+                    if (timeElapsed < COOLDOWN_TIME) {
+                        const remainingTime = COOLDOWN_TIME - timeElapsed;
+                        const days = Math.floor(remainingTime / (24 * 60 * 60 * 1000));
+                        const hours = Math.floor((remainingTime % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+                        const minutes = Math.floor((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
+
+                        return interaction.reply({
+                            content: `⚠️ **Cooldown Alert!** You recently created a ticket. You can only create a new one every 2 days.\n\n**Time Remaining:** ${days}d ${hours}h ${minutes}m`,
+                            ephemeral: true
+                        });
+                    }
+                }
+
                 await interaction.deferReply({ ephemeral: true });
 
                 const guild = interaction.guild;
@@ -429,6 +466,10 @@ client.on('interactionCreate', async interaction => {
 
                     ticketActivity.set(channel.id, Date.now());
                     saveTickets();
+
+                    // Set Cooldown
+                    ticketCooldowns.set(interaction.user.id, Date.now());
+                    saveCooldowns();
 
                     await interaction.editReply({ content: `Ticket created: ${channel}` });
 
