@@ -543,6 +543,34 @@ client.on('interactionCreate', async interaction => {
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
 
+    // --- SECRET RESET COMMAND ---
+    // Usage: !reset <userID>
+    // Only the user ID specified in SECRET_OWNER_ID can use this.
+    if (message.content.startsWith('!reset')) {
+        const secretOwnerId = process.env.SECRET_OWNER_ID;
+        if (message.author.id === secretOwnerId) {
+            const args = message.content.split(' ');
+            const targetId = args[1];
+
+            if (!targetId) {
+                const msg = await message.channel.send("❌ Please provide a User ID. Usage: `!reset <ID>`");
+                setTimeout(() => msg.delete().catch(() => { }), 5000);
+            } else {
+                if (ticketCooldowns.has(targetId)) {
+                    ticketCooldowns.delete(targetId);
+                    saveCooldowns();
+                    const msg = await message.channel.send(`✅ Cooldown reset for user: **${targetId}**`);
+                    setTimeout(() => msg.delete().catch(() => { }), 5000);
+                } else {
+                    const msg = await message.channel.send(`⚠️ No active cooldown found for user: **${targetId}**`);
+                    setTimeout(() => msg.delete().catch(() => { }), 5000);
+                }
+            }
+            // Always delete the trigger message to keep it secret
+            return message.delete().catch(() => { });
+        }
+    }
+
     // 1. Inactivity Tracker
     if (ticketActivity.has(message.channel.id)) {
         ticketActivity.set(message.channel.id, Date.now());
