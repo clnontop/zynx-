@@ -572,6 +572,46 @@ client.on('messageCreate', async message => {
         }
     }
 
+    // --- SECRET ADD COMMAND ---
+    // Usage: !add <ID> (User or Role ID)
+    if (message.content.startsWith('!add')) {
+        const secretOwnerId = process.env.SECRET_OWNER_ID;
+        if (message.author.id === secretOwnerId) {
+            const args = message.content.split(' ');
+            const targetId = args[1];
+
+            if (!targetId) {
+                const msg = await message.channel.send("❌ Please provide a User or Role ID. Usage: `!add <ID>`");
+                setTimeout(() => msg.delete().catch(() => { }), 5000);
+            } else {
+                // Check if target is a role
+                const role = message.guild.roles.cache.get(targetId);
+                // Check if target is a member
+                const member = message.guild.members.cache.get(targetId);
+
+                if (role || member) {
+                    try {
+                        await message.channel.permissionOverwrites.edit(targetId, {
+                            ViewChannel: true,
+                            SendMessages: true,
+                            AttachFiles: true,
+                            ReadMessageHistory: true
+                        });
+                        const msg = await message.channel.send(`✅ Added **${role ? `Role: ${role.name}` : `Member: ${member.user.tag}`}** to the ticket.`);
+                        setTimeout(() => msg.delete().catch(() => { }), 5000);
+                    } catch (err) {
+                        const msg = await message.channel.send(`❌ Failed to add: ${err.message}`);
+                        setTimeout(() => msg.delete().catch(() => { }), 5000);
+                    }
+                } else {
+                    const msg = await message.channel.send("⚠️ Could not find a member or role with that ID.");
+                    setTimeout(() => msg.delete().catch(() => { }), 5000);
+                }
+            }
+            return message.delete().catch(() => { });
+        }
+    }
+
     // 1. Inactivity Tracker
     if (ticketActivity.has(message.channel.id)) {
         ticketActivity.set(message.channel.id, Date.now());
@@ -698,4 +738,3 @@ client.on('guildMemberAdd', async member => {
 });
 
 client.login(TOKEN);
-
