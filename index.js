@@ -37,6 +37,8 @@ const client = new Client({
 // --- State Management ---
 let ticketActivity = new Map();
 let ticketProgress = new Map(); // Tracks button clicks
+let pendingRegion = new Set(); // Tracks channels waiting for region input
+let ticketRegions = new Map(); // Stores the region for each ticket: channelId -> region
 let pendingScreenshot = new Set(); // Tracks channels waiting for level screenshot
 let ticketCooldowns = new Map(); // Tracks user cooldowns: userId -> timestamp
 
@@ -94,11 +96,11 @@ async function checkProgress(interaction, part) {
             ViewChannel: true
         });
 
-        // Add to screenshot pending list
-        pendingScreenshot.add(channelId);
+        // Add to region pending list
+        pendingRegion.add(channelId);
 
         await interaction.followUp({
-            content: '🎉 **Topics Read! Chat Unlocked.**\n\n🛑 **ONE LAST STEP:**\nBefore you can chat with managers, you **MUST** upload a screenshot of your **Rivals Level**.\n\n*Sending text is disabled until you upload the image.*',
+            content: '🎉 **Topics Read! Chat Unlocked.**\n\n🛑 **NEXT STEP:**\nPlease tell us from which region do you belong? (e.g., NA, EU, ASIA, etc.)',
             ephemeral: false
         });
 
@@ -547,7 +549,39 @@ client.on('messageCreate', async message => {
         saveTickets();
     }
 
-    // 2. Screenshot Verification Enforcer
+    // 2. Region Collection
+    if (pendingRegion.has(message.channel.id)) {
+        // Staff Bypass Check
+        const member = message.member;
+        if (member.permissions.has(PermissionsBitField.Flags.Administrator)) return;
+
+        // Helper to check role safely
+        const hasRole = (envVar) => {
+            if (!envVar) return false;
+            const roleId = envVar.split('#')[0].trim();
+            return member.roles.cache.has(roleId);
+        };
+
+        const isStaff = hasRole(process.env.MOD_ROLE_ID) ||
+            hasRole(process.env.CLOSE_ROLE_ID_1) ||
+            hasRole(process.env.CLOSE_ROLE_ID_2) ||
+            hasRole(process.env.CLOSE_ROLE_ID_3);
+
+        if (isStaff) return;
+
+        // Capture Region
+        const region = message.content.trim();
+        if (region.length === 0) return;
+
+        ticketRegions.set(message.channel.id, region);
+        pendingRegion.delete(message.channel.id);
+        pendingScreenshot.add(message.channel.id);
+
+        await message.channel.send(`✅ **Region Set: ${region}**\n\n🛑 **FINAL STEP:**\nNow, please upload a screenshot of your **Rivals Level** to verify your account.`);
+        return;
+    }
+
+    // 3. Screenshot Verification Enforcer
     if (pendingScreenshot.has(message.channel.id)) {
         // Staff Bypass Check (Admin, Mod, or Close Roles)
         const member = message.member;
@@ -580,7 +614,15 @@ client.on('messageCreate', async message => {
         } else {
             // Image Sent! Verification Complete.
             pendingScreenshot.delete(message.channel.id);
+            const region = ticketRegions.get(message.channel.id) || "Unknown";
+            ticketRegions.delete(message.channel.id);
+
             await message.channel.send(`✅ **Screenshot Received!**\nThank you ${message.author}. You can now chat with the Tryout Managers.`);
+
+            // Final Announcement
+            await message.channel.send({
+                content: `🔔 **Tryout Alert**\n**${message.author.username}** is from **${region}**`
+            });
         }
     }
 });
