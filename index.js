@@ -410,7 +410,8 @@ client.on('interactionCreate', async interaction => {
                         process.env.MOD_ROLE_ID,
                         process.env.CLOSE_ROLE_ID_1,
                         process.env.CLOSE_ROLE_ID_2,
-                        process.env.CLOSE_ROLE_ID_3
+                        process.env.CLOSE_ROLE_ID_3,
+                        process.env.ADMIN_ROLE_ID
                     ];
 
                     for (const rawRoleId of staffRoles) {
@@ -593,7 +594,8 @@ client.on('messageCreate', async message => {
         const isStaff = hasRole(process.env.MOD_ROLE_ID) ||
             hasRole(process.env.CLOSE_ROLE_ID_1) ||
             hasRole(process.env.CLOSE_ROLE_ID_2) ||
-            hasRole(process.env.CLOSE_ROLE_ID_3);
+            hasRole(process.env.CLOSE_ROLE_ID_3) ||
+            hasRole(process.env.ADMIN_ROLE_ID);
 
         if (isStaff) return;
 
@@ -626,7 +628,8 @@ client.on('messageCreate', async message => {
             hasRole(process.env.MOD_ROLE_ID) ||
             hasRole(process.env.CLOSE_ROLE_ID_1) ||
             hasRole(process.env.CLOSE_ROLE_ID_2) ||
-            hasRole(process.env.CLOSE_ROLE_ID_3);
+            hasRole(process.env.CLOSE_ROLE_ID_3) ||
+            hasRole(process.env.ADMIN_ROLE_ID);
 
         if (isStaff) return; // Allow staff to speak
 
