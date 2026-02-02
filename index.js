@@ -100,7 +100,7 @@ async function checkProgress(interaction, part) {
         pendingRegion.add(channelId);
 
         await interaction.followUp({
-            content: '🎉 **Topics Read! Chat Unlocked.**\n\n🛑 **NEXT STEP:**\nPlease tell us from which region do you belong? (e.g., NA, EU, ASIA, etc.)',
+            content: '🎉 **Topics Read! Chat Unlocked.**\n\n🛑 **NEXT STEP:**\nPlease tell us from which region would you prefer to play in? ',
             ephemeral: false
         });
 
@@ -698,3 +698,4 @@ client.on('guildMemberAdd', async member => {
 });
 
 client.login(TOKEN);
+
